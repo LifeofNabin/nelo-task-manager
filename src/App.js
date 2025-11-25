@@ -5,6 +5,8 @@ import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import Filter from './components/Filter';
 import Search from './components/Search';
+import EmailStatus from './components/EmailStatus';
+import useTaskScheduler from './hooks/useTaskScheduler';
 import { getTasks, createTask, deleteTask, toggleTaskStatus, updateTask } from './utils/taskStorage';
 import './App.css';
 
@@ -19,6 +21,26 @@ function App() {
   const [currentFilter, setCurrentFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTask, setEditingTask] = useState(null);
+
+  // ✅ Email notification state
+  const [emailNotificationsEnabled, setEmailNotificationsEnabled] = useState(true);
+
+  // Get user email from session
+  const getUserEmail = () => {
+    const user = sessionStorage.getItem('nelo_user');
+    if (user) {
+      const userData = JSON.parse(user);
+      return userData.email;
+    }
+    return 'User';
+  };
+
+  // ✅ Task scheduler hook - sends emails every 20 minutes
+  const { lastEmailSent, emailStatus, nextEmailIn } = useTaskScheduler(
+    tasks,
+    getUserEmail(),
+    isLoggedIn && emailNotificationsEnabled
+  );
 
   // Check if user is already logged in (session storage check)
   useEffect(() => {
@@ -146,16 +168,6 @@ function App() {
     setCurrentFilter(filterId);
   };
 
-  // Get user email from session
-  const getUserEmail = () => {
-    const user = sessionStorage.getItem('nelo_user');
-    if (user) {
-      const userData = JSON.parse(user);
-      return userData.email;
-    }
-    return 'User';
-  };
-
   // Show loading state while checking authentication
   if (isLoading) {
     return (
@@ -168,15 +180,13 @@ function App() {
       </div>
     );
   }
-// neext step
+
   // Show Login or Dashboard based on authentication
   return (
     <div className="App">
       {!isLoggedIn ? (
-        // Login Screen
         <Login onLogin={handleLogin} />
       ) : (
-        // Dashboard (after login)
         <div className="min-h-screen bg-gray-100">
           {/* Header */}
           <header className="bg-white shadow-md">
@@ -212,6 +222,13 @@ function App() {
               onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
               editingTask={editingTask}
               onCancel={handleCancelEdit}
+            />
+
+            {/* Email Status Component */}
+            <EmailStatus 
+              emailStatus={emailStatus}
+              lastEmailSent={lastEmailSent}
+              nextEmailIn={nextEmailIn}
             />
 
             {/* Search Component */}
