@@ -12,34 +12,32 @@ const Login = ({ onLogin }) => {
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+
     // Clear error when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  // Validate form
+  // Validate form fields
   const validate = () => {
     const newErrors = {};
-    
+
     // Email validation
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     // Password validation
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -47,22 +45,33 @@ const Login = ({ onLogin }) => {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (!validate()) {
-      return;
-    }
+    if (!validate()) return;
 
     setIsLoading(true);
-    
-    // Simulate login delay
+
     setTimeout(() => {
-      // Store credentials in sessionStorage
+      const DEMO_EMAIL = 'demo@nelo.com';
+      const DEMO_PASSWORD = 'demo123';
+
+      const newErrors = {};
+
+      // Check credentials individually
+      if (formData.email !== DEMO_EMAIL) newErrors.email = 'Email is incorrect';
+      if (formData.password !== DEMO_PASSWORD) newErrors.password = 'Password is incorrect';
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        setIsLoading(false);
+        return;
+      }
+
+      // ✅ Correct credentials
       sessionStorage.setItem('nelo_user', JSON.stringify({
         email: formData.email,
         loggedIn: true,
         loginTime: new Date().toISOString()
       }));
-      
+
       setIsLoading(false);
       onLogin();
     }, 1000);
@@ -71,7 +80,7 @@ const Login = ({ onLogin }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-        
+
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">🥬</div>
@@ -81,14 +90,14 @@ const Login = ({ onLogin }) => {
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          
+
           {/* Email Field */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               Email Address
             </label>
             <input
-              type="email"
+              type="text"
               id="email"
               name="email"
               value={formData.email}
@@ -99,7 +108,7 @@ const Login = ({ onLogin }) => {
               placeholder="you@example.com"
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              <p className="text-red-500 text-sm mt-1">⚠️ {errors.email}</p>
             )}
           </div>
 
@@ -120,7 +129,7 @@ const Login = ({ onLogin }) => {
               placeholder="••••••••"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              <p className="text-red-500 text-sm mt-1">⚠️ {errors.password}</p>
             )}
           </div>
 
@@ -143,9 +152,12 @@ const Login = ({ onLogin }) => {
 
         {/* Demo credentials info */}
         <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-800 font-medium mb-1">Demo Credentials:</p>
+          <p className="text-sm text-blue-800 font-medium mb-1">💡 Demo Credentials:</p>
           <p className="text-xs text-blue-700">Email: demo@nelo.com</p>
           <p className="text-xs text-blue-700">Password: demo123</p>
+          <p className="text-xs text-gray-600 mt-2 italic">
+            (Only these credentials will work)
+          </p>
         </div>
       </div>
     </div>
