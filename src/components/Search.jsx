@@ -7,7 +7,7 @@ const Search = ({ onSearch }) => {
   const [isSearching, setIsSearching] = useState(false);
   
   // Debounce search term with 500ms delay
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 800);
 
   // Effect to trigger search when debounced value changes
   useEffect(() => {
