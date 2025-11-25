@@ -1,3 +1,4 @@
+// src/components/TaskForm.jsx
 import React, { useState, useEffect } from 'react';
 
 const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
@@ -19,20 +20,15 @@ const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
         priority: editingTask.priority,
         dueDate: editingTask.dueDate,
       });
-    } else {
-      setFormData({
-        title: '',
-        description: '',
-        priority: 'medium',
-        dueDate: '',
-      });
     }
   }, [editingTask]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -40,20 +36,33 @@ const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!formData.dueDate) newErrors.dueDate = 'Due date is required';
+    
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    }
+    
+    if (!formData.description.trim()) {
+      newErrors.description = 'Description is required';
+    }
+    
+    if (!formData.dueDate) {
+      newErrors.dueDate = 'Due date is required';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    
+    if (!validate()) {
+      return;
+    }
 
     onSubmit(formData);
-
-    // Only clear form if creating (not editing)
+    
+    // Clear form after submission (only if not editing)
     if (!editingTask) {
       setFormData({
         title: '',
@@ -70,9 +79,8 @@ const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">
         {editingTask ? 'Edit Task' : 'Create New Task'}
       </h2>
-
+      
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Title */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Title *
@@ -87,10 +95,11 @@ const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
             }`}
             placeholder="Enter task title"
           />
-          {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+          )}
         </div>
 
-        {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Description *
@@ -105,10 +114,11 @@ const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
             }`}
             placeholder="Enter task description"
           />
-          {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+          )}
         </div>
 
-        {/* Priority & Due Date */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -139,19 +149,20 @@ const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
                 errors.dueDate ? 'border-red-500' : 'border-gray-300'
               }`}
             />
-            {errors.dueDate && <p className="text-red-500 text-sm mt-1">{errors.dueDate}</p>}
+            {errors.dueDate && (
+              <p className="text-red-500 text-sm mt-1">{errors.dueDate}</p>
+            )}
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 pt-2">
           <button
             type="submit"
             className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
             {editingTask ? 'Update Task' : 'Create Task'}
           </button>
-
+          
           {editingTask && (
             <button
               type="button"
