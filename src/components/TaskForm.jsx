@@ -1,27 +1,152 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 
-export default function TaskForm({ addTask }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("Medium");
-  const [dueDate, setDueDate] = useState("");
+const TaskForm = ({ onSubmit }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    priority: 'medium',
+    dueDate: '',
+  });
 
-  const handleSubmit = e => {
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    }
+    
+    if (!formData.description.trim()) {
+      newErrors.description = 'Description is required';
+    }
+    
+    if (!formData.dueDate) {
+      newErrors.dueDate = 'Due date is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if(!title || !description || !dueDate) return alert("Fill all required fields");
-    addTask({ title, description, priority, dueDate, status:"Pending", id: Date.now() });
-    setTitle(""); setDescription(""); setPriority("Medium"); setDueDate("");
+    
+    if (!validate()) {
+      return;
+    }
+
+    onSubmit(formData);
+    
+    // Clear form
+    setFormData({
+      title: '',
+      description: '',
+      priority: 'medium',
+      dueDate: '',
+    });
+    setErrors({});
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow flex flex-col gap-2 w-full md:w-80">
-      <input placeholder="Title" value={title} onChange={e=>setTitle(e.target.value)} className="border p-2"/>
-      <textarea placeholder="Description" value={description} onChange={e=>setDescription(e.target.value)} className="border p-2"/>
-      <select value={priority} onChange={e=>setPriority(e.target.value)} className="border p-2">
-        <option>High</option><option>Medium</option><option>Low</option>
-      </select>
-      <input type="date" value={dueDate} onChange={e=>setDueDate(e.target.value)} className="border p-2"/>
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded mt-2">Add Task</button>
-    </form>
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Create New Task</h2>
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Title *
+          </label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.title ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="Enter task title"
+          />
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description *
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="3"
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.description ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="Enter task description"
+          />
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Priority *
+            </label>
+            <select
+              name="priority"
+              value={formData.priority}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Due Date *
+            </label>
+            <input
+              type="date"
+              name="dueDate"
+              value={formData.dueDate}
+              onChange={handleChange}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.dueDate ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.dueDate && (
+              <p className="text-red-500 text-sm mt-1">{errors.dueDate}</p>
+            )}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+        >
+          Create Task
+        </button>
+      </form>
+    </div>
   );
-}
+};
+
+export default TaskForm;

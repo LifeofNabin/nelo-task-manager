@@ -1,20 +1,35 @@
-import TaskItem from "./TaskItem";
-import useDebounce from "../hooks/useDebounce";
+import React from 'react';
+import TaskItem from './TaskItem';
 
-export default function TaskList({ tasks, filter, search, editTask, deleteTask, toggleStatus }) {
-  const debouncedSearch = useDebounce(search, 500);
-
-  const filteredTasks = tasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(debouncedSearch.toLowerCase());
-    const matchesFilter = filter === "All" || task.status === filter || task.priority === filter;
-    return matchesSearch && matchesFilter;
-  });
+const TaskList = ({ tasks, onDelete, onToggleStatus }) => {
+  if (tasks.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-12 text-center">
+        <div className="text-6xl mb-4">📝</div>
+        <h3 className="text-2xl font-semibold text-gray-600 mb-2">No Tasks Found</h3>
+        <p className="text-gray-500">Create a new task to get started!</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      {filteredTasks.length === 0 ? <p>No tasks found</p> : filteredTasks.map(task => (
-        <TaskItem key={task.id} task={task} editTask={editTask} deleteTask={deleteTask} toggleStatus={toggleStatus} />
+    <div className="space-y-4">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-gray-700">
+          Showing {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+        </h2>
+      </div>
+      
+      {tasks.map(task => (
+        <TaskItem
+          key={task.id}
+          task={task}
+          onDelete={onDelete}
+          onToggleStatus={onToggleStatus}
+        />
       ))}
     </div>
   );
-}
+};
+
+export default TaskList;
