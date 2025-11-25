@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const TaskItem = ({ task, onDelete, onToggleStatus }) => {
+const TaskItem = ({ task, onDelete, onToggleStatus, onEdit }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const getPriorityColor = (priority) => {
@@ -73,6 +73,13 @@ const TaskItem = ({ task, onDelete, onToggleStatus }) => {
           }`}
         >
           {task.status === 'completed' ? '↩ Mark Pending' : '✓ Mark Complete'}
+        </button>
+
+        <button
+          onClick={() => onEdit(task)}
+          className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-lg font-medium"
+        >
+          ✏️ Edit
         </button>
 
         {!showDeleteConfirm ? (

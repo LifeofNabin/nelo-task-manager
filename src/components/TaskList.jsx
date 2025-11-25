@@ -1,7 +1,7 @@
 import React from 'react';
 import TaskItem from './TaskItem';
 
-const TaskList = ({ tasks, onDelete, onToggleStatus }) => {
+const TaskList = ({ tasks, onDelete, onToggleStatus, onEdit }) => {
   if (tasks.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-12 text-center">
@@ -26,6 +26,7 @@ const TaskList = ({ tasks, onDelete, onToggleStatus }) => {
           task={task}
           onDelete={onDelete}
           onToggleStatus={onToggleStatus}
+          onEdit={onEdit} // Pass onEdit to each item
         />
       ))}
     </div>
